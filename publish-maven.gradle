@@ -1,5 +1,48 @@
-apply plugin: "propdeps-maven"
+//apply plugin: "maven-publish"
+plugins {
+	id 'maven-publish'
+}
 
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			pom {
+				name = "spring-webflow"
+				description = "spring-webflow"
+				url = "https://github.com/spring-projects/spring-webflow"
+				organization {
+					name = "Spring IO"
+					url = "http://projects.spring.io/spring-webflow"
+				}
+				licenses {
+					license {
+						name "The Apache Software License, Version 2.0"
+						url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						distribution "repo"
+					}
+				}
+				scm {
+					url = "https://github.com/spring-projects/spring-webflow"
+					connection = "scm:git:git://github.com/spring-projects/spring-webflow"
+					developerConnection = "scm:git:git://github.com/spring-projects/spring-webflow"
+				}
+				developers {
+					developer {
+						id = "rstoyanchev"
+						name = "Rossen Stoyanchev"
+						email = "rstoyanchev@pivotal.io"
+					}
+				}
+				issueManagement {
+					system = "Jira"
+					url = "https://jira.spring.io/browse/SWF"
+				}
+			}
+		}
+	}
+}
+
+/*
 install {
 	repositories.mavenInstaller {
 		customizePom(pom, project)
@@ -53,3 +96,4 @@ def customizePom(pom, gradleProject) {
 		}
 	}
 }
+*/

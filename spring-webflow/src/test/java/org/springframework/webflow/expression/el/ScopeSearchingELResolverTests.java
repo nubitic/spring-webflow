@@ -3,7 +3,7 @@ package org.springframework.webflow.expression.el;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.el.ELResolver;
+import jakarta.el.ELResolver;
 
 import org.springframework.webflow.execution.RequestContextHolder;
 import org.springframework.webflow.test.MockRequestContext;

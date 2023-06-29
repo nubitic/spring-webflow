@@ -122,7 +122,6 @@ public class HibernateFlowExecutionListener implements FlowExecutionListener {
 		if (isPersistenceContext(context.getActiveFlow())) {
 			Session session = getHibernateSession(context.getFlowExecutionContext().getActiveSession());
 			unbind(session);
-			session.disconnect();
 		}
 	}
 

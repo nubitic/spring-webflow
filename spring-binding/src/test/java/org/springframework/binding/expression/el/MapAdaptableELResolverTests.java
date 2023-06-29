@@ -3,7 +3,7 @@ package org.springframework.binding.expression.el;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.el.ELContext;
+import jakarta.el.ELContext;
 
 import junit.framework.TestCase;
 

@@ -1,11 +1,11 @@
 buildscript {
 	repositories {
-		maven { url "http://repo.spring.io/plugins-release" }
+		maven { url "https://maven.aliyun.com/repository/spring-plugin" }
 	}
 	dependencies {
 		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
 		classpath("io.spring.gradle:spring-io-plugin:0.0.8.RELEASE")
-		classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
+		//classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
 	}
 }
 
@@ -13,25 +13,80 @@ allprojects {
 
 	group = "org.springframework.webflow"
 
-	apply plugin: "propdeps"
+//	apply plugin: "propdeps"
 	apply plugin: "java"
-	apply from: "${rootProject.projectDir}/ide.gradle"
+	apply plugin: "maven-publish"
+//	apply from: "${rootProject.projectDir}/ide.gradle"
 }
 
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+	withSourcesJar()
+}
+
+
 subprojects { subproject ->
+	task sourceJar(type: Jar) {
+		classifier 'sources'
+		from sourceSets.main.allJava
+	}
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				from components.java
+				artifact tasks.sourceJar
+				pom {
+					name = "spring-webflow"
+					description = "spring-webflow"
+					url = "https://github.com/nubitic/spring-webflow"
+					organization {
+						name = "Spring IO"
+						url = "http://projects.spring.io/spring-webflow"
+					}
+					licenses {
+						license {
+							name = "The Apache Software License, Version 2.0"
+							url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+							distribution = "repo"
+						}
+					}
+					scm {
+						url = "https://github.com/nubitic/spring-webflow.git"
+						connection = "scm:git:https://github.com/nubitic/spring-webflow.git"
+						developerConnection = "scm:git:https://github.com/nubitic/spring-webflow.git"
+					}
+					developers {
+						developer {
+							id = "rstoyanchev"
+							name = "Rossen Stoyanchev"
+							email = "rstoyanchev@pivotal.io"
+						}
+					}
+				}
+			}
+		}
+		repositories {
+			maven { 
+				url "https://nexus-repo.nubitic.mx/repository/releases/"
+				}
+		}
+	}
 
-	apply from: "${rootProject.projectDir}/publish-maven.gradle"
-
-	sourceCompatibility=1.8
-	targetCompatibility=1.8
+	sourceCompatibility=17
+	targetCompatibility=17
 
 	[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:none"]
 
 	sourceSets.test.resources.srcDirs = ["src/main/java", "src/test/resources", "src/test/java"]
 
 	repositories {
-		maven { url "http://repo.spring.io/libs-release" }
-		maven { url "http://repo.spring.io/libs-snapshot" }
+		maven { url "https://repo1.maven.org/maven2" }
+		maven { 
+			url "https://nexus-repo.nubitic.mx/repository/releases/"
+			}
+		mavenLocal()
 	}
 
 	jar {
@@ -67,11 +122,11 @@ configure(subprojects.findAll {
 	}
 
 	subproject.ext {
-		springVersion         = "5.0.9.RELEASE"
-		springSecurityVersion = "5.0.8.RELEASE"
-		servletVersion        = "3.1.0"
-		hibernate5Version     = "5.2.17.Final"
-		tiles3Version         = "3.0.8"
+		springVersion         = "6.0.10"
+		springSecurityVersion = "6.1.1"
+		servletVersion        = "6.0.0"
+		hibernate5Version     = "6.2.5.Final"
+		tiles3Version         = "3.0.8-nubitic-jakarta-api"
 		log4jVersion          = "2.11.1"
 	}
 
@@ -90,20 +145,37 @@ configure(subprojects.findAll {
 	}
 
 	dependencies {
-		compile("org.springframework:spring-beans:$springVersion")
-		compile("org.springframework:spring-context:$springVersion")
-		compile("org.springframework:spring-core:$springVersion")
-		compile("org.springframework:spring-expression:$springVersion")
-		compileOnly("javax.el:javax.el-api:3.0.1-b04")
-		testCompile("junit:junit:4.12") {
+		compileOnly("org.springframework:spring-beans:$springVersion")
+		compileOnly("org.springframework:spring-context:$springVersion")
+		compileOnly("org.springframework:spring-core:$springVersion")
+		compileOnly("org.springframework:spring-expression:$springVersion")
+		compileOnly("jakarta.el:jakarta.el-api:4.0.0")
+		testCompileOnly("junit:junit:4.12") {
 			exclude group:'org.hamcrest', module:'hamcrest-core'
 		}
-		testCompile("org.hamcrest:hamcrest-all:1.3")
-		testCompile("org.easymock:easymock:3.5.1")
-		testCompile("org.apache.tomcat:tomcat-jasper-el:8.5.27")
-		testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-		testRuntime("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}")
-		testRuntime("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+		testCompileOnly("org.hamcrest:hamcrest-all:1.3")
+		testCompileOnly("org.easymock:easymock:3.5.1")
+		testCompileOnly("org.apache.tomcat:tomcat-jasper-el:10.1.10")
+		testRuntimeOnly("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+		testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}")
+		testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+		testCompileOnly("org.springframework:spring-beans:$springVersion")
+		testCompileOnly("org.springframework:spring-context:$springVersion")
+		testCompileOnly("org.springframework:spring-core:$springVersion")
+		testCompileOnly("org.springframework:spring-expression:$springVersion")
+		testCompileOnly("jakarta.el:jakarta.el-api:4.0.0")
+		
+		testRuntimeOnly("junit:junit:4.12") {
+			exclude group:'org.hamcrest', module:'hamcrest-core'
+		}
+		testRuntimeOnly("org.springframework:spring-beans:$springVersion")
+		testRuntimeOnly("org.springframework:spring-context:$springVersion")
+		testRuntimeOnly("org.springframework:spring-core:$springVersion")
+		testRuntimeOnly("org.springframework:spring-expression:$springVersion")
+		testRuntimeOnly("jakarta.el:jakarta.el-api:4.0.0")
+		testRuntimeOnly("org.hamcrest:hamcrest-all:1.3")
+		testRuntimeOnly("org.easymock:easymock:3.5.1")
+		testRuntimeOnly("org.apache.tomcat:tomcat-jasper-el:10.1.10")
 	}
 
 	tasks.withType(Test).all {
@@ -111,25 +183,25 @@ configure(subprojects.findAll {
 		include "**/*Tests.class"
 	}
 
-	javadoc {
+	/*javadoc {
 		options.memberLevel = JavadocMemberLevel.PROTECTED
 		options.author = true
 		options.header = project.name
-	}
+	}*/
 
 	task sourcesJar(type: Jar, dependsOn:classes) {
-		classifier = "sources"
+		archiveClassifier = "sources"
 		from sourceSets.main.allJava
 	}
 
-	task javadocJar(type: Jar) {
-		classifier = "javadoc"
+	/*task javadocJar(type: Jar) {
+		archiveClassifier = "javadoc"
 		from javadoc
-	}
+	}*/
 
 	artifacts {
 		archives sourcesJar
-		archives javadocJar
+		//archives javadocJar
 	}
 }
 
@@ -141,56 +213,104 @@ project("spring-webflow") {
 	description = "Spring Web Flow"
 
 	dependencies {
-		compile(project(":spring-binding"))
-		compile("org.springframework:spring-web:$springVersion")
-		compile("org.springframework:spring-webmvc:$springVersion")
-		provided("javax.servlet:javax.servlet-api:$servletVersion")
-		optional("org.hibernate:hibernate-core:$hibernate5Version")
-		optional("org.springframework.security:spring-security-core:$springSecurityVersion")
-		optional("org.springframework:spring-orm:$springVersion")
-		optional("org.springframework:spring-tx:$springVersion")
-		optional("org.apache.tiles:tiles-api:$tiles3Version")
-		optional("org.apache.tiles:tiles-core:$tiles3Version")
-		optional("org.apache.tiles:tiles-servlet:$tiles3Version")
-		optional("org.apache.tiles:tiles-jsp:$tiles3Version")
-		optional("org.apache.tiles:tiles-el:$tiles3Version")
-		optional("org.apache.tiles:tiles-extras:$tiles3Version") {
+		compileOnly(project(":spring-binding"))
+		compileOnly("org.springframework:spring-web:$springVersion")
+		compileOnly("org.springframework:spring-webmvc:$springVersion")
+		compileOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		compileOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		compileOnly("org.hibernate:hibernate-core:$hibernate5Version")
+		compileOnly("jakarta.persistence:jakarta.persistence-api:3.1.0")
+		compileOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
+		compileOnly("org.springframework:spring-orm:$springVersion")
+		compileOnly("org.springframework:spring-tx:$springVersion")
+		compileOnly("org.apache.tiles:tiles-api:$tiles3Version")
+		compileOnly("org.apache.tiles:tiles-core:$tiles3Version")
+		compileOnly("org.apache.tiles:tiles-servlet:$tiles3Version")
+		compileOnly("org.apache.tiles:tiles-jsp:$tiles3Version")
+		compileOnly("org.apache.tiles:tiles-el:$tiles3Version")
+		compileOnly("org.apache.tiles:tiles-extras:$tiles3Version") {
 			exclude group: "org.springframework", module: "spring-web"
 		}
-		provided("junit:junit:3.8.2")
-		testCompile("org.springframework:spring-aop:$springVersion")
-		testCompile("org.springframework:spring-jdbc:$springVersion")
-		testCompile("org.springframework:spring-test:$springVersion")
-		testCompile("javax.validation:validation-api:1.1.0.Final")
-		testCompile("org.hibernate:hibernate-entitymanager:$hibernate5Version")
-		testCompile("org.hibernate:hibernate-validator:6.0.7.Final")
-		testCompile("org.hsqldb:hsqldb:2.4.0")
-		testCompile("javax.servlet.jsp:javax.servlet.jsp-api:2.3.2-b02")
-		testCompile("javax.servlet:jstl:1.2")
+		compileOnly("junit:junit:3.8.2")
+		testCompileOnly(project(":spring-binding"))
+		testCompileOnly("org.springframework:spring-aop:$springVersion")
+		testCompileOnly("org.springframework:spring-jdbc:$springVersion")
+		testCompileOnly("org.springframework:spring-test:$springVersion")
+		testCompileOnly("javax.validation:validation-api:1.1.0.Final")
+		//testCompileOnly("org.hibernate:hibernate-entitymanager:$hibernate5Version")
+		testCompileOnly("org.hibernate:hibernate-validator:6.0.7.Final")
+		testCompileOnly("org.hsqldb:hsqldb:2.4.0")
+		testCompileOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		testCompileOnly("org.springframework:spring-web:$springVersion")
+		testCompileOnly("org.springframework:spring-webmvc:$springVersion")
+		testCompileOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		testCompileOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		testCompileOnly("org.hibernate:hibernate-core:$hibernate5Version")
+		testCompileOnly("jakarta.persistence:jakarta.persistence-api:3.1.0")
+		testCompileOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
+		testCompileOnly("org.springframework:spring-orm:$springVersion")
+		testCompileOnly("org.springframework:spring-tx:$springVersion")
+		testCompileOnly("org.apache.tiles:tiles-api:$tiles3Version")
+		testCompileOnly("org.apache.tiles:tiles-core:$tiles3Version")
+		testCompileOnly("org.apache.tiles:tiles-servlet:$tiles3Version")
+		testCompileOnly("org.apache.tiles:tiles-jsp:$tiles3Version")
+		testCompileOnly("org.apache.tiles:tiles-el:$tiles3Version")
+		testCompileOnly("org.apache.tiles:tiles-extras:$tiles3Version") {
+			exclude group: "org.springframework", module: "spring-web"
+		}
+		
+		
+		testRuntimeOnly(project(":spring-binding"))
+		testRuntimeOnly("org.springframework:spring-aop:$springVersion")
+		testRuntimeOnly("org.springframework:spring-jdbc:$springVersion")
+		testRuntimeOnly("org.springframework:spring-test:$springVersion")
+		testRuntimeOnly("javax.validation:validation-api:1.1.0.Final")
+		//testRuntimeOnly("org.hibernate:hibernate-entitymanager:$hibernate5Version")
+		testRuntimeOnly("org.hibernate:hibernate-validator:6.0.7.Final")
+		testRuntimeOnly("org.hsqldb:hsqldb:2.4.0")
+		testRuntimeOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		testRuntimeOnly("org.springframework:spring-web:$springVersion")
+		testRuntimeOnly("org.springframework:spring-webmvc:$springVersion")
+		testRuntimeOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		testRuntimeOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		testRuntimeOnly("org.hibernate:hibernate-core:$hibernate5Version")
+		testRuntimeOnly("jakarta.persistence:jakarta.persistence-api:3.1.0")
+		testRuntimeOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
+		testRuntimeOnly("org.springframework:spring-orm:$springVersion")
+		testRuntimeOnly("org.springframework:spring-tx:$springVersion")
+		testRuntimeOnly("org.apache.tiles:tiles-api:$tiles3Version")
+		testRuntimeOnly("org.apache.tiles:tiles-core:$tiles3Version")
+		testRuntimeOnly("org.apache.tiles:tiles-servlet:$tiles3Version")
+		testRuntimeOnly("org.apache.tiles:tiles-jsp:$tiles3Version")
+		testRuntimeOnly("org.apache.tiles:tiles-el:$tiles3Version")
+		testRuntimeOnly("org.apache.tiles:tiles-extras:$tiles3Version") {
+			exclude group: "org.springframework", module: "spring-web"
+		}
+		//testCompile("javax.servlet:jstl:1.2")
 	}
 }
-
+/*
 project("spring-faces") {
 	description = "Spring Faces"
 
 	dependencies {
-		compile(project(":spring-binding"))
-		compile(project(":spring-webflow"))
-		compile("org.springframework:spring-web:$springVersion")
-		compile("org.springframework:spring-webmvc:$springVersion")
-		provided("javax.servlet:javax.servlet-api:$servletVersion")
-		provided("com.sun.faces:jsf-api:2.2.16")
-		provided("com.sun.faces:jsf-impl:2.2.16")
-		provided("org.apache.myfaces.core:myfaces-impl:2.2.12")
-		optional("com.sun.facelets:jsf-facelets:1.1.14")
-		optional("org.springframework.security:spring-security-core:$springSecurityVersion")
-		optional("org.springframework.security:spring-security-web:$springSecurityVersion")
-		optional("org.springframework.security:spring-security-taglibs:$springSecurityVersion")
-		testCompile("org.apache.myfaces.test:myfaces-test22:1.0.8")
-		testCompile("org.springframework:spring-test:$springVersion")
+		compileOnly(project(":spring-binding"))
+		compileOnly(project(":spring-webflow"))
+		compileOnly("org.springframework:spring-web:$springVersion")
+		compileOnly("org.springframework:spring-webmvc:$springVersion")
+		compileOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		compileOnly("jakarta.faces:jakarta.faces-api:2.3.2")
+		compileOnly("org.glassfish:jakarta.faces:2.3.19")
+		compileOnly("org.apache.myfaces.core:myfaces-impl:2.3.10")
+		compileOnly("com.sun.facelets:jsf-facelets:1.1.14")
+		compileOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
+		compileOnly("org.springframework.security:spring-security-web:$springSecurityVersion")
+		compileOnly("org.springframework.security:spring-security-taglibs:$springSecurityVersion")
+		testCompileOnly("org.apache.myfaces.test:myfaces-test22:1.0.8")
+		testCompileOnly("org.springframework:spring-test:$springVersion")
 	}
 }
-
+*/
 project("spring-js-resources") {
 	description = "Spring JS Resources"
 
@@ -204,12 +324,12 @@ project("spring-js-resources") {
 configure(rootProject) {
 	description = "Spring Web Flow"
 
-	apply plugin: "docbook-reference"
+	/*apply plugin: "docbook-reference"
 
 	reference {
 		sourceDir = file("src/reference")
 		pdfFilename = "spring-webflow-reference.pdf"
-	}
+	}*/
 
 	// don"t publish the default jar for the root project
 	configurations.archives.artifacts.clear()
@@ -217,7 +337,7 @@ configure(rootProject) {
 	artifacts {
 	}
 
-	task api(type: Javadoc) {
+	/*task api(type: Javadoc) {
 		group = "Documentation"
 		description = "Generates aggregated Javadoc API documentation."
 		title = "${rootProject.description} ${version} API"
@@ -233,13 +353,13 @@ configure(rootProject) {
 			project.sourceSets.main.compileClasspath
 		})
 		maxMemory = "1024m"
-	}
+	}*/
 
-	task docsZip(type: Zip) {
+	/*task docsZip(type: Zip) {
 		group = "Distribution"
-		baseName = "spring-webflow"
-		classifier = "docs"
-		description = "Builds -${classifier} archive containing api and reference " +
+		archiveBaseName = "spring-webflow"
+		archiveClassifier = "docs"
+		description = "Builds -${archiveClassifier} archive containing api and reference " +
 			"for deployment at static.springframework.org/spring-webflow/docs."
 
 		from (api) {
@@ -249,15 +369,15 @@ configure(rootProject) {
 		from (reference) {
 			into "reference"
 		}
-	}
+	}*/
 
 	task schemaZip(type: Zip) {
 		group = "Distribution"
-		baseName = "spring-webflow"
-		classifier = "schema"
-		description = "Builds -${classifier} archive containing all " +
+		archiveBaseName = "spring-webflow"
+		archiveClassifier = "schema"
+		description = "Builds -${archiveClassifier} archive containing all " +
 			"XSDs for deployment at static.springframework.org/schema."
-
+		duplicatesStrategy = "exclude"
 		subprojects.each { subproject ->
 			Properties schemas = new Properties()
 
@@ -287,14 +407,14 @@ configure(rootProject) {
 		}
 	}
 
-	task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
+	task distZip(type: Zip, dependsOn: [/*docsZip,*/ schemaZip]) {
 		group = "Distribution"
-		baseName = "spring-webflow"
-		classifier = "dist"
-		description = "Builds -${classifier} archive, containing all jars and docs, " +
+		archiveBaseName = "spring-webflow"
+		archiveClassifier = "dist"
+		description = "Builds -${archiveClassifier} archive, containing all jars and docs, " +
 					  "suitable for community download page."
 
-		def baseDir = "${baseName}-${project.version}"
+		def baseDir = "${archiveBaseName}-${project.version}"
 
 		from("src/dist") {
 			include "notice.txt"
@@ -309,9 +429,9 @@ configure(rootProject) {
 			expand(version: project.version)
 		}
 
-		from(zipTree(docsZip.archivePath)) {
+		/*from(zipTree(docsZip.archivePath)) {
 			into "${baseDir}/docs"
-		}
+		}*/
 
 		from(zipTree(schemaZip.archivePath)) {
 			into "${baseDir}/schema"
@@ -324,20 +444,20 @@ configure(rootProject) {
 				if (subproject.tasks.findByPath("sourcesJar")) {
 					from subproject.sourcesJar
 				}
-				if (subproject.tasks.findByPath("javadocJar")) {
+				/*if (subproject.tasks.findByPath("javadocJar")) {
 					from subproject.javadocJar
-				}
+				}*/
 			}
 		}
 	}
 
 	artifacts {
-		archives docsZip
+		//archives docsZip
 		archives schemaZip
 		archives distZip
 	}
 
-	task wrapper(type: Wrapper) {
+	/*task wrapper(type: Wrapper) {
 		description = "Generates gradlew[.bat] scripts"
 		gradleVersion = '3.2.1'
 
@@ -351,5 +471,5 @@ configure(rootProject) {
 			wrapperBatFile.text = wrapperBatFile.text.replace("set DEFAULT_JVM_OPTS=",
 					"set GRADLE_OPTS=$gradleBatOpts %GRADLE_OPTS%\nset DEFAULT_JVM_OPTS=")
 		}
-	}
+	}*/
 }

@@ -1,8 +1,8 @@
 package org.springframework.webflow.expression.el;
 
 import java.util.List;
-import javax.el.ELContext;
-import javax.el.ELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 
 import junit.framework.TestCase;
 
