@@ -14,7 +14,7 @@ allprojects {
 	group = "org.springframework.webflow"
 
 //	apply plugin: "propdeps"
-	apply plugin: "java"
+	apply plugin: "java-library"
 	apply plugin: "maven-publish"
 //	apply from: "${rootProject.projectDir}/ide.gradle"
 }
@@ -145,11 +145,11 @@ configure(subprojects.findAll {
 	}
 
 	dependencies {
-		compileOnly("org.springframework:spring-beans:$springVersion")
-		compileOnly("org.springframework:spring-context:$springVersion")
-		compileOnly("org.springframework:spring-core:$springVersion")
-		compileOnly("org.springframework:spring-expression:$springVersion")
-		compileOnly("jakarta.el:jakarta.el-api:4.0.0")
+		api("org.springframework:spring-beans:$springVersion")
+		api("org.springframework:spring-context:$springVersion")
+		api("org.springframework:spring-core:$springVersion")
+		api("org.springframework:spring-expression:$springVersion")
+		implementation("jakarta.el:jakarta.el-api:4.0.0")
 		testCompileOnly("junit:junit:4.12") {
 			exclude group:'org.hamcrest', module:'hamcrest-core'
 		}
@@ -213,25 +213,25 @@ project("spring-webflow") {
 	description = "Spring Web Flow"
 
 	dependencies {
-		compileOnly(project(":spring-binding"))
-		compileOnly("org.springframework:spring-web:$springVersion")
-		compileOnly("org.springframework:spring-webmvc:$springVersion")
-		compileOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
-		compileOnly("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
-		compileOnly("org.hibernate:hibernate-core:$hibernate5Version")
-		compileOnly("jakarta.persistence:jakarta.persistence-api:3.1.0")
-		compileOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
-		compileOnly("org.springframework:spring-orm:$springVersion")
-		compileOnly("org.springframework:spring-tx:$springVersion")
-		compileOnly("org.apache.tiles:tiles-api:$tiles3Version")
-		compileOnly("org.apache.tiles:tiles-core:$tiles3Version")
-		compileOnly("org.apache.tiles:tiles-servlet:$tiles3Version")
-		compileOnly("org.apache.tiles:tiles-jsp:$tiles3Version")
-		compileOnly("org.apache.tiles:tiles-el:$tiles3Version")
-		compileOnly("org.apache.tiles:tiles-extras:$tiles3Version") {
+		api(project(":spring-binding"))
+		api("org.springframework:spring-web:$springVersion")
+		api("org.springframework:spring-webmvc:$springVersion")
+		implementation("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		implementation("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0")
+		api("org.hibernate:hibernate-core:$hibernate5Version")
+		implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+		api("org.springframework.security:spring-security-core:$springSecurityVersion")
+		api("org.springframework:spring-orm:$springVersion")
+		api("org.springframework:spring-tx:$springVersion")
+		api("org.apache.tiles:tiles-api:$tiles3Version")
+		api("org.apache.tiles:tiles-core:$tiles3Version")
+		api("org.apache.tiles:tiles-servlet:$tiles3Version")
+		api("org.apache.tiles:tiles-jsp:$tiles3Version")
+		api("org.apache.tiles:tiles-el:$tiles3Version")
+		api("org.apache.tiles:tiles-extras:$tiles3Version") {
 			exclude group: "org.springframework", module: "spring-web"
 		}
-		compileOnly("junit:junit:3.8.2")
+		api("junit:junit:3.8.2")
 		testCompileOnly(project(":spring-binding"))
 		testCompileOnly("org.springframework:spring-aop:$springVersion")
 		testCompileOnly("org.springframework:spring-jdbc:$springVersion")
@@ -294,18 +294,18 @@ project("spring-faces") {
 	description = "Spring Faces"
 
 	dependencies {
-		compileOnly(project(":spring-binding"))
-		compileOnly(project(":spring-webflow"))
-		compileOnly("org.springframework:spring-web:$springVersion")
-		compileOnly("org.springframework:spring-webmvc:$springVersion")
-		compileOnly("jakarta.servlet:jakarta.servlet-api:$servletVersion")
-		compileOnly("jakarta.faces:jakarta.faces-api:2.3.2")
-		compileOnly("org.glassfish:jakarta.faces:2.3.19")
-		compileOnly("org.apache.myfaces.core:myfaces-impl:2.3.10")
-		compileOnly("com.sun.facelets:jsf-facelets:1.1.14")
-		compileOnly("org.springframework.security:spring-security-core:$springSecurityVersion")
-		compileOnly("org.springframework.security:spring-security-web:$springSecurityVersion")
-		compileOnly("org.springframework.security:spring-security-taglibs:$springSecurityVersion")
+		api(project(":spring-binding"))
+		api(project(":spring-webflow"))
+		api("org.springframework:spring-web:$springVersion")
+		api("org.springframework:spring-webmvc:$springVersion")
+		api("jakarta.servlet:jakarta.servlet-api:$servletVersion")
+		api("jakarta.faces:jakarta.faces-api:2.3.2")
+		api("org.glassfish:jakarta.faces:2.3.19")
+		api("org.apache.myfaces.core:myfaces-impl:2.3.10")
+		api("com.sun.facelets:jsf-facelets:1.1.14")
+		api("org.springframework.security:spring-security-core:$springSecurityVersion")
+		api("org.springframework.security:spring-security-web:$springSecurityVersion")
+		api("org.springframework.security:spring-security-taglibs:$springSecurityVersion")
 		testCompileOnly("org.apache.myfaces.test:myfaces-test22:1.0.8")
 		testCompileOnly("org.springframework:spring-test:$springVersion")
 	}
